@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ccwork — Architecture</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8f9fa; --surface: #ffffff; --border: #e2e8f0;
+      --text: #1a202c; --muted: #718096; --accent: #4f46e5;
+      --tab-active: #4f46e5; --tab-active-text: #fff;
+      --tab-bg: #f1f5f9; --tab-text: #475569;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --border: #334155;
+      --text: #f1f5f9; --muted: #94a3b8; --accent: #818cf8;
+      --tab-active: #6366f1; --tab-active-text: #fff;
+      --tab-bg: #1e293b; --tab-text: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 24px; }
+    header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .header-left h1 { font-size: 1.4rem; font-weight: 700; }
+    .header-left p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .theme-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 500; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab-btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.84rem; font-weight: 600; background: var(--tab-bg); color: var(--tab-text); transition: all .15s; }
+    .tab-btn.active { background: var(--tab-active); color: var(--tab-active-text); }
+    .panel { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+    .panel.active { display: block; }
+    .panel h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .panel p.desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 22px; line-height: 1.6; }
+    .mermaid { display: flex; justify-content: center; overflow-x: auto; }
+    .legend { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 16px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.76rem; color: var(--muted); }
+    .dot { width: 10px; height: 10px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <h1>📝 ccwork — Architecture</h1>
+    <p>React 19 + TypeScript + Vite &nbsp;·&nbsp; 생성: 2026-05-29</p>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()">🌙 다크 모드</button>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="show('t1', this)">컴포넌트 트리</button>
+  <button class="tab-btn" onclick="show('t2', this)">Import 의존성</button>
+  <button class="tab-btn" onclick="show('t3', this)">상태 흐름</button>
+  <button class="tab-btn" onclick="show('t4', this)">데이터 흐름</button>
+</div>
+
+<div id="t1" class="panel active">
+  <h2>컴포넌트 트리</h2>
+  <p class="desc">렌더링 계층 구조. 점선 화살표는 ReactNode 슬롯 props로 주입된 컴포넌트입니다.</p>
+  <div class="mermaid">
+flowchart TD
+    main["main.tsx\n진입점"] --> App
+    App["App.tsx\nselectedNoteId · isCreating"] --> Provider
+    Provider["NotesProvider\nContext 공급자"] --> Layout["Layout\n헤더 + 사이드바 + 메인"]
+    Layout -.->|"sidebar prop"| NoteList["NoteList\n노트 목록"]
+    Layout -.->|"main prop"| NoteEditor["NoteEditor\n편집 / 생성"]
+    NoteList --> NoteItem["NoteItem\n순수 표현 컴포넌트 × N"]
+    style main fill:#e2e8f0,stroke:#94a3b8,color:#1a202c
+    style App fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    style Provider fill:#dcfce7,stroke:#22c55e,color:#14532d
+    style Layout fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    style NoteList fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteEditor fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteItem fill:#fce7f3,stroke:#ec4899,color:#831843
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:#3b82f6"></div>App</div>
+    <div class="legend-item"><div class="dot" style="background:#22c55e"></div>Context</div>
+    <div class="legend-item"><div class="dot" style="background:#f59e0b"></div>Layout</div>
+    <div class="legend-item"><div class="dot" style="background:#8b5cf6"></div>컨텐츠 컴포넌트</div>
+    <div class="legend-item"><div class="dot" style="background:#ec4899"></div>순수 표현 컴포넌트</div>
+  </div>
+</div>
+
+<div id="t2" class="panel">
+  <h2>Import 의존성</h2>
+  <p class="desc">파일 간 import 방향. A → B = "A가 B를 import". 실제 코드의 import 구문에서 추출.</p>
+  <div class="mermaid">
+flowchart LR
+    main["main.tsx"] --> App["App.tsx"]
+    App --> NotesCtx["context/NotesContext.tsx"]
+    App --> Layout["components/Layout.tsx"]
+    App --> NoteList["components/NoteList.tsx"]
+    App --> NoteEditor["components/NoteEditor.tsx"]
+    NoteList --> NotesCtx
+    NoteList --> NoteItem["components/NoteItem.tsx"]
+    NoteEditor --> NotesCtx
+    NoteItem --> NoteType["types/note.ts"]
+    NotesCtx --> ApiNotes["api/notes.ts"]
+    NotesCtx --> NoteType
+    ApiNotes --> NoteType
+    style main fill:#e2e8f0,stroke:#94a3b8,color:#1a202c
+    style App fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    style NotesCtx fill:#dcfce7,stroke:#22c55e,color:#14532d
+    style Layout fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    style NoteList fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteEditor fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteItem fill:#fce7f3,stroke:#ec4899,color:#831843
+    style ApiNotes fill:#ffedd5,stroke:#f97316,color:#7c2d12
+    style NoteType fill:#f1f5f9,stroke:#64748b,color:#334155
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:#f97316"></div>API 레이어</div>
+    <div class="legend-item"><div class="dot" style="background:#64748b"></div>타입 정의</div>
+  </div>
+</div>
+
+<div id="t3" class="panel">
+  <h2>상태 흐름</h2>
+  <p class="desc">상태 소유·소비 관계. 실선 = props 전달, 점선 = Context 소비(useNotes 훅).</p>
+  <div class="mermaid">
+flowchart TD
+    subgraph AppState ["App 상태 (UI 선택)"]
+        SID["selectedNoteId · string|null"]
+        IC["isCreating · boolean"]
+    end
+    subgraph CtxState ["NotesContext 상태 (전역)"]
+        Notes["notes[] · Note[]"]
+        Loading["loading · boolean"]
+        Err["error · string|null"]
+    end
+    subgraph LocalState ["NoteEditor 로컬 상태"]
+        Title["title · string"]
+        Content["content · string"]
+        Saving["saving · boolean"]
+    end
+    AppState -->|"selectedNoteId, onSelect"| NoteList["NoteList"]
+    AppState -->|"selectedNoteId, isCreating, onDone"| NoteEditor["NoteEditor"]
+    CtxState -.->|"useNotes(): notes, loading, error, deleteNote"| NoteList
+    CtxState -.->|"useNotes(): notes, createNote, updateNote"| NoteEditor
+    NoteList -->|"note, isSelected, onSelect, onDelete"| NoteItem["NoteItem"]
+    NoteEditor --> LocalState
+    style AppState fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    style CtxState fill:#dcfce7,stroke:#22c55e,color:#14532d
+    style LocalState fill:#f1f5f9,stroke:#94a3b8,color:#334155
+    style NoteList fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteEditor fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteItem fill:#fce7f3,stroke:#ec4899,color:#831843
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:#3b82f6"></div>App state</div>
+    <div class="legend-item"><div class="dot" style="background:#22c55e"></div>Context state</div>
+    <div class="legend-item"><div class="dot" style="background:#94a3b8"></div>Local state</div>
+  </div>
+</div>
+
+<div id="t4" class="panel">
+  <h2>데이터 흐름</h2>
+  <p class="desc">API 호출 체인. 컴포넌트는 Context 액션만 호출하며 api/ 레이어를 직접 사용하지 않습니다. 타임스탬프는 api/ 레이어에서만 주입.</p>
+  <div class="mermaid">
+flowchart TD
+    Server[("JSON Server\nlocalhost:3001/notes")]
+    subgraph API ["api/notes.ts"]
+        F["fetchNotes()\nGET /notes"]
+        C["createNote()\nPOST + 타임스탬프 주입"]
+        U["updateNote()\nPATCH + updatedAt 주입"]
+        D["deleteNote()\nDELETE /notes/:id"]
+    end
+    subgraph Context ["NotesContext 액션"]
+        CF["mount → fetchNotes()"]
+        CC["createNote(title,content)"]
+        CU["updateNote(id,updates)"]
+        CD["deleteNote(id)"]
+    end
+    NoteEditor["NoteEditor"] -->|"createNote 호출"| CC
+    NoteEditor -->|"updateNote 호출"| CU
+    NoteList["NoteList"] -->|"deleteNote 호출"| CD
+    CF --> F
+    CC --> C
+    CU --> U
+    CD --> D
+    F <-->|HTTP| Server
+    C <-->|HTTP| Server
+    U <-->|HTTP| Server
+    D <-->|HTTP| Server
+    style Server fill:#fef3c7,stroke:#f59e0b,color:#78350f
+    style NoteEditor fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style NoteList fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style API fill:#ffedd5,stroke:#f97316,color:#7c2d12
+    style Context fill:#dcfce7,stroke:#22c55e,color:#14532d
+  </div>
+</div>
+
+<script>
+  const saved = localStorage.getItem('arch-theme') || 'light';
+  if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); document.querySelector('.theme-btn').textContent = '☀️ 라이트 모드'; }
+  mermaid.initialize({ startOnLoad: true, theme: saved === 'dark' ? 'dark' : 'default', flowchart: { curve: 'basis' }, securityLevel: 'loose' });
+  function show(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function toggleTheme() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+    document.querySelector('.theme-btn').textContent = dark ? '🌙 다크 모드' : '☀️ 라이트 모드';
+    localStorage.setItem('arch-theme', dark ? 'light' : 'dark');
+    location.reload();
+  }
+</script>
+</body>
+</html>
