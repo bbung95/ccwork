@@ -103,7 +103,7 @@ Conventional Commits 형식 필수. `git commit` 시 husky가 자동 검증.
 ```
 
 - **제목 필수** — `type: 제목` 형식 (type 없으면 차단)
-- **본문 필수, 최소 2줄** — 빈 본문 또는 1줄이면 차단
+- **본문 필수, 최소 1줄** — 빈 본문이면 차단
 - **주요 type**: `feat` · `fix` · `chore` · `docs` · `refactor` · `test` · `style`
 
 ## 주의사항

@@ -5,7 +5,7 @@ export default {
       rules: {
         "body-min-lines": ({ body }) => {
           const lines = (body || "").split("\n").filter((line) => line.trim() !== "");
-          return [lines.length >= 2, "body must have at least 2 non-empty lines"];
+          return [lines.length >= 1, "body must have at least 1 non-empty line"];
         },
       },
     },
