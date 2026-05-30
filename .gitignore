@@ -19,8 +19,7 @@ dist-ssr/
 
 # Claude Code
 .claude/settings.local.json
-.claude/skills/*-workspace/
-.claude/skills/*/evals/
+.claude/skills/*
 
 # Editor
 .vscode/*

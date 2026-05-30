@@ -21,6 +21,7 @@ npm run test:watch   # Vitest (watch 모드)
 ## 아키텍처
 
 ### 상태 관리 흐름
+
 ```
 App.tsx (selectedNoteId, isCreating)
   └─ NotesProvider (notes[], loading, error, createNote/updateNote/deleteNote)
@@ -33,30 +34,33 @@ App.tsx (selectedNoteId, isCreating)
 - **api/notes.ts**: fetch 기반 얇은 래퍼. `createdAt`/`updatedAt` 타임스탬프를 API 레이어에서 주입.
 
 ### 백엔드
+
 - `db.json` — JSON Server의 데이터 파일 (git 추적 중)
 - 엔드포인트: `http://localhost:3001/notes`
 - `Note` 타입: `id | title | content | createdAt | updatedAt` (`tags`는 미구현, 강의에서 추가 예정)
 
 ## 기술 스택
 
-| 항목 | 내용 |
-|------|------|
-| UI | React 19, Tailwind CSS v4 |
-| 빌드 | Vite 6, TypeScript 5 |
-| 테스트 | Vitest + @testing-library/react (jsdom) |
-| 린트/포맷 | ESLint 9 (flat config), Prettier 3 |
-| Mock API | json-server 1.x beta |
+| 항목      | 내용                                    |
+| --------- | --------------------------------------- |
+| UI        | React 19, Tailwind CSS v4               |
+| 빌드      | Vite 6, TypeScript 5                    |
+| 테스트    | Vitest + @testing-library/react (jsdom) |
+| 린트/포맷 | ESLint 9 (flat config), Prettier 3      |
+| Mock API  | json-server 1.x beta                    |
 
 ## 구현 패턴
 
 ### 컴포넌트
-- **named export** 사용 (`export function Foo`, default export 없음)
+
+- **컴포넌트는 반드시 named export만 사용한다** (`export function Foo`, default export 금지)
 - Props 인터페이스는 같은 파일에 `ComponentNameProps`로 정의
 - 로딩/에러/빈 상태는 early return으로 처리 (guard clause 패턴)
 - 순수 표현 컴포넌트(`NoteItem`)는 Context를 직접 사용하지 않고 props만 받음
 - 레이아웃 슬롯은 `ReactNode` props로 주입 (`sidebar`, `main`)
 
 ### 상태 관리
+
 - **전역**: `NotesContext` — 노트 데이터 + CRUD 액션
 - **로컬**: 컴포넌트 내부 UI 상태 (`title`, `content`, `saving`)
 - **App 레벨**: 컴포넌트 간 공유가 필요한 UI 상태 (`selectedNoteId`, `isCreating`)
@@ -64,20 +68,22 @@ App.tsx (selectedNoteId, isCreating)
 - 선택된 노트 변경 시 `useEffect`로 폼 동기화
 
 ### API 호출
+
 - 컴포넌트는 `api/notes.ts`를 직접 호출하지 않음 — 반드시 `useNotes()` 액션을 통해 호출
 - 비동기 액션은 `setSaving(true)` → `try/catch/finally` → `setSaving(false)` 패턴
 - `createdAt` / `updatedAt` 타임스탬프는 `api/notes.ts` 레이어에서 주입 (컴포넌트·Context에서 직접 세팅 안 함)
 
 ### 네이밍
-| 구분 | 패턴 | 예시 |
-|------|------|------|
-| 컴포넌트 내 이벤트 핸들러 | `handle*` | `handleSave` |
-| 이벤트 핸들러 props | `on*` | `onSelect`, `onDone` |
-| Context 액션 | 동사+명사 | `createNote`, `updateNote`, `deleteNote` |
-| API 함수 | 동사+명사 | `fetchNotes`, `createNote`, `deleteNote` |
-| boolean 상태 | `is*` / `has*` | `isCreating`, `isSelected` |
-| 컴포넌트 파일 | PascalCase | `NoteEditor.tsx` |
-| 유틸·API 파일 | camelCase | `notes.ts` |
+
+| 구분                      | 패턴           | 예시                                     |
+| ------------------------- | -------------- | ---------------------------------------- |
+| 컴포넌트 내 이벤트 핸들러 | `handle*`      | `handleSave`                             |
+| 이벤트 핸들러 props       | `on*`          | `onSelect`, `onDone`                     |
+| Context 액션              | 동사+명사      | `createNote`, `updateNote`, `deleteNote` |
+| API 함수                  | 동사+명사      | `fetchNotes`, `createNote`, `deleteNote` |
+| boolean 상태              | `is*` / `has*` | `isCreating`, `isSelected`               |
+| 컴포넌트 파일             | PascalCase     | `NoteEditor.tsx`                         |
+| 유틸·API 파일             | camelCase      | `notes.ts`                               |
 
 ## 알려진 패턴 불일치
 
