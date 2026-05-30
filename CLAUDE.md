@@ -91,6 +91,21 @@ App.tsx (selectedNoteId, isCreating)
 - **boolean 상태 네이밍 혼재**: `isCreating`, `isSelected`는 `is*` 접두사를 따르지만 `loading`(NotesContext), `saving`(NoteEditor)은 접두사 없이 사용. 새 boolean 상태 추가 시 기존 맥락을 따를 것.
 - **에러 처리**: `alert()` 사용 금지. 유효성 실패는 `console.log`, API 에러는 `console.error`로 처리.
 
+## 커밋 규칙
+
+Conventional Commits 형식 필수. `git commit` 시 husky가 자동 검증.
+
+```
+<type>: 제목
+
+본문 첫 번째 줄
+본문 두 번째 줄
+```
+
+- **제목 필수** — `type: 제목` 형식 (type 없으면 차단)
+- **본문 필수, 최소 2줄** — 빈 본문 또는 1줄이면 차단
+- **주요 type**: `feat` · `fix` · `chore` · `docs` · `refactor` · `test` · `style`
+
 ## 주의사항
 
 - Tailwind CSS v4는 `@tailwindcss/vite` 플러그인 방식으로 통합됨 (PostCSS 불필요)
