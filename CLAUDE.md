@@ -106,6 +106,24 @@ Conventional Commits 형식 필수. `git commit` 시 husky가 자동 검증.
 - **본문 필수, 최소 1줄** — 빈 본문이면 차단
 - **주요 type**: `feat` · `fix` · `chore` · `docs` · `refactor` · `test` · `style`
 
+## 디자인 시스템
+
+전체 스펙: `docs/design-system/`
+
+**모든 스타일·UI 작업은 반드시 아래 절차를 따른다:**
+
+1. 작업 시작 전 `/design-check` 스킬을 호출해 현재 상태를 점검한다.
+2. 구현 중 관련 스펙 파일(`docs/design-system/`)을 참조한다. 훅이 스타일 관련 프롬프트에서 자동으로 주입한다.
+3. 파일 저장(Edit/Write) 후 PostToolUse 훅이 자동으로 규칙 위반을 검사한다. 경고가 출력되면 즉시 수정한다.
+4. 작업 완료 후 `/design-check`를 다시 호출해 최종 검증한다.
+
+**항상 적용되는 핵심 규칙:**
+
+- 컬러는 `--blue`/`--red`만 채도 허용, 나머지 무채색 위계
+- 경계는 `border` 대신 그림자(`--shadow-sm/md/lg`)로 표현
+- 라운드: 카드 `20px` / 버튼 `14px` / 아이콘 버튼 `11px`
+- 등장 애니메이션은 `translateY + scale + opacity` 조합 + spring 이징
+
 ## 주의사항
 
 - Tailwind CSS v4는 `@tailwindcss/vite` 플러그인 방식으로 통합됨 (PostCSS 불필요)
