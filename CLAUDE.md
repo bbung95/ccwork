@@ -119,6 +119,7 @@ Conventional Commits 형식 필수. `git commit` 시 husky가 자동 검증.
 
 **항상 적용되는 핵심 규칙:**
 
+- **색상은 반드시 CSS 변수(`var(--)`)로만 사용한다** — hex·rgb·rgba 하드코딩 금지. 토큰에 없는 색상은 `tokens.md`에 추가 후 알린다.
 - 컬러는 `--blue`/`--red`만 채도 허용, 나머지 무채색 위계
 - 경계는 `border` 대신 그림자(`--shadow-sm/md/lg`)로 표현
 - 라운드: 카드 `20px` / 버튼 `14px` / 아이콘 버튼 `11px`

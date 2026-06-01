@@ -21,9 +21,14 @@ if grep -E "box-shadow:" "$FILE" | grep -qvE "var\(--shadow|none|inherit|initial
   WARNS+=("[tokens] box-shadow 하드코딩 — var(--shadow-sm/md/lg) 사용")
 fi
 
-# [tokens] hex 색상 직접 사용 — CSS 변수 정의 라인(--xxx:) 및 주석 제외
-if grep -E ":\s*#[0-9a-fA-F]{3,6}" "$FILE" | grep -qvE "^\s*--|/\*|//"; then
-  WARNS+=("[tokens] 하드코딩 hex 색상 감지 — var(--blue), var(--ink) 등 CSS 변수 사용")
+# [tokens] 색상 하드코딩 금지 — 모든 색상은 CSS 변수로만 사용
+# hex 색상 (CSS 변수 정의 라인·주석 제외, 3/4/6/8자리 모두 감지)
+if grep -E ":\s*[\"']?#[0-9a-fA-F]{3,8}" "$FILE" | grep -qvE "^\s*--|/\*|//"; then
+  WARNS+=("[tokens] 하드코딩 hex 색상 — 반드시 CSS 변수(var(--blue), var(--ink) 등) 사용. 토큰에 없는 색상은 tokens.md에 추가 후 알릴 것")
+fi
+# rgb/rgba/hsl 색상 직접 사용 (color/background/fill/stroke 프로퍼티, box-shadow 제외)
+if grep -E "(color|background(-color)?|fill|stroke)\s*[=:]\s*[\"']?\s*rgba?\(" "$FILE" | grep -qvE "^\s*--|/\*|//"; then
+  WARNS+=("[tokens] 하드코딩 rgb/rgba 색상 — 반드시 CSS 변수 사용. 토큰에 없는 색상은 tokens.md에 추가 후 알릴 것")
 fi
 
 # [motion] linear 이징 금지 — 기계적인 느낌
