@@ -1,15 +1,17 @@
 import { useState } from 'react';
 
-// stub: Green 단계에서 로직을 채운다
 export function useTags(initialTags: string[]) {
-  const [tags] = useState<string[]>(initialTags);
-  return {
-    tags,
-    addTag(input: string) {
-      void input;
-    },
-    setTags(newTags: string[]) {
-      void newTags;
-    },
+  const [tags, setTagsState] = useState<string[]>(initialTags);
+
+  const addTag = (input: string) => {
+    const normalized = input.trim().toLowerCase();
+    if (!normalized) return;
+    setTagsState((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
   };
+
+  const setTags = (newTags: string[]) => {
+    setTagsState(newTags);
+  };
+
+  return { tags, addTag, setTags };
 }
