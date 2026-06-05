@@ -55,4 +55,36 @@ describe('useTags', () => {
     });
     expect(result.current.tags).toHaveLength(1);
   });
+
+  it('should remove the tag when an existing tag is given', () => {
+    const { result } = renderHook(() => useTags(['react']));
+    act(() => {
+      result.current.removeTag('react');
+    });
+    expect(result.current.tags).not.toContain('react');
+  });
+
+  it('should remove only the matching tag and keep the others', () => {
+    const { result } = renderHook(() => useTags(['react', 'vue', 'svelte']));
+    act(() => {
+      result.current.removeTag('vue');
+    });
+    expect(result.current.tags).toEqual(['react', 'svelte']);
+  });
+
+  it('should result in empty array when removing the last remaining tag', () => {
+    const { result } = renderHook(() => useTags(['react']));
+    act(() => {
+      result.current.removeTag('react');
+    });
+    expect(result.current.tags).toEqual([]);
+  });
+
+  it('should be no-op when the tag does not exist', () => {
+    const { result } = renderHook(() => useTags(['react']));
+    act(() => {
+      result.current.removeTag('vue');
+    });
+    expect(result.current.tags).toEqual(['react']);
+  });
 });
