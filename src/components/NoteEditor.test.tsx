@@ -222,4 +222,56 @@ describe('NoteEditor', () => {
 
     expect(screen.getByPlaceholderText('태그 추가')).toBeEnabled();
   });
+
+  it('should call updateNote with the current tags when saving an existing note that has tags', async () => {
+    const note = makeNote({ id: '1', title: 'My Note', tags: ['react', 'vue'] });
+    const ctx = mockContext([note]);
+    mockUseNotes.mockReturnValue(ctx);
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }));
+
+    expect(ctx.updateNote).toHaveBeenCalledWith(
+      '1',
+      expect.objectContaining({ tags: ['react', 'vue'] }),
+    );
+  });
+
+  it('should call updateNote with an empty tags array when the note has no tags', async () => {
+    const note = makeNote({ id: '1', title: 'My Note', tags: [] });
+    const ctx = mockContext([note]);
+    mockUseNotes.mockReturnValue(ctx);
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }));
+
+    expect(ctx.updateNote).toHaveBeenCalledWith('1', expect.objectContaining({ tags: [] }));
+  });
+
+  it('should call createNote with the entered tags when saving a new note', async () => {
+    const ctx = mockContext([]);
+    mockUseNotes.mockReturnValue(ctx);
+
+    render(<NoteEditor selectedNoteId={null} isCreating={true} onDone={vi.fn()} />);
+
+    await userEvent.type(screen.getByPlaceholderText('제목'), 'New Note');
+    await userEvent.type(screen.getByPlaceholderText('태그 추가'), 'react{Enter}');
+    await userEvent.click(screen.getByRole('button', { name: '저장' }));
+
+    expect(ctx.createNote).toHaveBeenCalledWith('New Note', '', ['react']);
+  });
+
+  it('should call onDone after a successful save (existing feedback preserved)', async () => {
+    const note = makeNote({ id: '1', title: 'My Note', tags: ['react'] });
+    const onDone = vi.fn();
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={onDone} />);
+
+    await userEvent.click(screen.getByRole('button', { name: '저장' }));
+
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
 });
