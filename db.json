@@ -34,6 +34,13 @@
       "createdAt": "2026-05-29T04:42:38.257Z",
       "updatedAt": "2026-05-29T04:42:38.257Z",
       "id": "F0BDEQaiUh0"
+    },
+    {
+      "title": "안녕하세요",
+      "content": "안녕하세요",
+      "createdAt": "2026-06-04T12:33:31.070Z",
+      "updatedAt": "2026-06-04T12:33:57.337Z",
+      "id": "YHz5k5ZcZ-o"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
