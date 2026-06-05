@@ -179,4 +179,47 @@ describe('NoteEditor', () => {
 
     expect(screen.queryByTestId('tag-area')).not.toBeInTheDocument();
   });
+
+  const tenTags = Array.from({ length: 10 }, (_, i) => `tag${i}`);
+
+  it('should keep the tag input enabled when the note has fewer than 10 tags', () => {
+    const note = makeNote({ id: '1', tags: ['react', 'vue', 'svelte'] });
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    expect(screen.getByPlaceholderText('태그 추가')).toBeEnabled();
+  });
+
+  it('should disable the tag input when the note has 10 tags', () => {
+    const note = makeNote({ id: '1', tags: tenTags });
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    expect(screen.getByPlaceholderText('태그 추가')).toBeDisabled();
+  });
+
+  it('should still allow removing a tag via X button when 10 tags are reached', async () => {
+    const note = makeNote({ id: '1', tags: tenTags });
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'tag5 삭제' }));
+
+    expect(screen.queryByText('tag5')).not.toBeInTheDocument();
+  });
+
+  it('should re-enable the tag input after removing a tag from a 10-tag note', async () => {
+    const note = makeNote({ id: '1', tags: tenTags });
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+    expect(screen.getByPlaceholderText('태그 추가')).toBeDisabled();
+
+    await userEvent.click(screen.getByRole('button', { name: 'tag5 삭제' }));
+
+    expect(screen.getByPlaceholderText('태그 추가')).toBeEnabled();
+  });
 });

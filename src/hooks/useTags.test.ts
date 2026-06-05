@@ -87,4 +87,36 @@ describe('useTags', () => {
     });
     expect(result.current.tags).toEqual(['react']);
   });
+
+  const makeTags = (count: number) => Array.from({ length: count }, (_, i) => `tag${i}`);
+
+  it('should add the tag when there are 9 tags (just under the limit)', () => {
+    const { result } = renderHook(() => useTags(makeTags(9)));
+    act(() => {
+      result.current.addTag('tag9');
+    });
+    expect(result.current.tags).toHaveLength(10);
+    expect(result.current.tags).toContain('tag9');
+  });
+
+  it('should be no-op when tags already has 10 tags (limit reached)', () => {
+    const { result } = renderHook(() => useTags(makeTags(10)));
+    act(() => {
+      result.current.addTag('overflow');
+    });
+    expect(result.current.tags).toHaveLength(10);
+    expect(result.current.tags).not.toContain('overflow');
+  });
+
+  it('should allow adding again after removeTag drops the count below the limit', () => {
+    const { result } = renderHook(() => useTags(makeTags(10)));
+    act(() => {
+      result.current.removeTag('tag0');
+    });
+    act(() => {
+      result.current.addTag('fresh');
+    });
+    expect(result.current.tags).toHaveLength(10);
+    expect(result.current.tags).toContain('fresh');
+  });
 });
