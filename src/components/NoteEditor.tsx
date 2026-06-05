@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNotes } from '../context/NotesContext';
-import { useTags } from '../hooks/useTags';
+import { useTags, MAX_TAGS } from '../hooks/useTags';
 import { EditorTagChip } from './EditorTagChip';
 import { TagInput } from './TagInput';
 
@@ -102,7 +102,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
             ))}
           </div>
         )}
-        <TagInput key={selectedNoteId} onAdd={addTag} />
+        <TagInput key={selectedNoteId} onAdd={addTag} disabled={tags.length >= MAX_TAGS} />
       </div>
 
       {/* 버튼 영역 */}
