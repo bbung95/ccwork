@@ -17,7 +17,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
   const [saving, setSaving] = useState(false);
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId);
-  const { tags, addTag, setTags } = useTags(selectedNote?.tags ?? []);
+  const { tags, addTag, removeTag, setTags } = useTags(selectedNote?.tags ?? []);
 
   // 선택된 노트가 바뀔 때 폼 동기화
   useEffect(() => {
@@ -98,7 +98,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
         {tags.length > 0 && (
           <div data-testid="tag-area" className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <EditorTagChip key={tag} label={tag} />
+              <EditorTagChip key={tag} label={tag} onRemove={() => removeTag(tag)} />
             ))}
           </div>
         )}

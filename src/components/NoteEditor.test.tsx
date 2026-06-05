@@ -155,4 +155,28 @@ describe('NoteEditor', () => {
     expect(screen.queryByText('typescript')).not.toBeInTheDocument();
     expect(screen.getByText('vue')).toBeInTheDocument();
   });
+
+  it('should remove the chip when its X button is clicked', async () => {
+    const note = makeNote({ id: '1', tags: ['react', 'vue'] });
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'react 삭제' }));
+
+    expect(screen.queryByText('react')).not.toBeInTheDocument();
+    expect(screen.getByText('vue')).toBeInTheDocument();
+  });
+
+  it('should hide the tag area entirely when the last tag is removed', async () => {
+    const note = makeNote({ id: '1', tags: ['react'] });
+    mockUseNotes.mockReturnValue(mockContext([note]));
+
+    render(<NoteEditor selectedNoteId="1" isCreating={false} onDone={vi.fn()} />);
+    expect(screen.getByTestId('tag-area')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'react 삭제' }));
+
+    expect(screen.queryByTestId('tag-area')).not.toBeInTheDocument();
+  });
 });

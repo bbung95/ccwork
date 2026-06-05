@@ -9,9 +9,13 @@ export function useTags(initialTags: string[]) {
     setTagsState((prev) => (prev.includes(normalized) ? prev : [...prev, normalized]));
   };
 
+  const removeTag = (tag: string) => {
+    setTagsState((prev) => prev.filter((t) => t !== tag));
+  };
+
   const setTags = (newTags: string[]) => {
     setTagsState(newTags);
   };
 
-  return { tags, addTag, setTags };
+  return { tags, addTag, removeTag, setTags };
 }
