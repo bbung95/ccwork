@@ -63,3 +63,54 @@ test.describe('태그 — 저장 영속성 (E2E 고유 검증)', () => {
     await expect(page.getByText('drop')).toHaveCount(0);
   });
 });
+
+/**
+ * US-9 — 저장하지 않고 다른 노트로 이동하면 태그 변경이 유실된다.
+ *
+ * 단위 테스트(NoteEditor)는 노트 전환 시 UI의 tags가 리셋되는지까지만(API 목킹)
+ * 검증한다. E2E는 거기서 한 발 더 나아가, 미저장 태그가 실제 서버에 절대
+ * 기록되지 않았는지를 새로고침으로 확인한다 — 이것이 E2E만 할 수 있는 검증이다.
+ */
+test.describe('태그 — 미저장 변경 (내비게이션)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
+  test('태그를 추가하고 저장하지 않은 채 다른 노트로 이동하면 추가가 유실되고 서버에도 남지 않는다', async ({
+    page,
+  }) => {
+    const titleA = `e2e-tag-unsavedA-${Date.now()}`;
+    const titleB = `e2e-tag-unsavedB-${Date.now()}`;
+
+    // 노트 A: 태그 'permanent'를 붙여 저장
+    await page.getByRole('button', { name: '새 노트' }).click();
+    await page.getByPlaceholder('제목').fill(titleA);
+    const tagInput = page.getByPlaceholder('태그 추가');
+    await tagInput.fill('permanent');
+    await tagInput.press('Enter');
+    await page.getByRole('button', { name: '저장' }).click();
+
+    // 노트 B: 전환 대상으로 빈 노트 하나 저장
+    await page.getByRole('button', { name: '새 노트' }).click();
+    await page.getByPlaceholder('제목').fill(titleB);
+    await page.getByRole('button', { name: '저장' }).click();
+
+    // 노트 A를 열어 'unsavedtemp'를 추가하되 저장하지 않는다
+    await page.getByText(titleA).click();
+    await tagInput.fill('unsavedtemp');
+    await tagInput.press('Enter');
+    await expect(page.getByText('unsavedtemp')).toBeVisible();
+
+    // 저장 없이 노트 B로 이동했다가 다시 A로 돌아온다 → 미저장 태그는 사라진다
+    await page.getByText(titleB).click();
+    await page.getByText(titleA).click();
+    await expect(page.getByText('permanent')).toBeVisible();
+    await expect(page.getByText('unsavedtemp')).toHaveCount(0);
+
+    // E2E 고유 검증: 미저장 태그는 서버에도 기록되지 않았다
+    await page.reload();
+    await page.getByText(titleA).click();
+    await expect(page.getByText('permanent')).toBeVisible();
+    await expect(page.getByText('unsavedtemp')).toHaveCount(0);
+  });
+});
