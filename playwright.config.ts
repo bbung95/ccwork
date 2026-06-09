@@ -10,6 +10,8 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   testMatch: '**/*.spec.ts',
+  // SLOWMO를 켜면 액션마다 지연이 쌓여 기본 30s 타임아웃을 넘기므로 넉넉히 늘린다.
+  timeout: process.env.SLOWMO ? 120_000 : 30_000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -18,6 +20,9 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
+    // 동작을 눈으로 따라가고 싶을 때 SLOWMO(ms)로 각 액션 사이에 지연을 준다.
+    // 기본 0 → 평소·CI 실행 속도에는 영향 없음. 예: SLOWMO=800 npm run test:e2e:headed
+    launchOptions: { slowMo: Number(process.env.SLOWMO) || 0 },
   },
   projects: [
     {
