@@ -10,7 +10,7 @@ interface NoteListProps {
 
 export function NoteList({ selectedNoteId, onSelect }: NoteListProps) {
   const { notes, loading, error, deleteNote } = useNotes();
-  const { allTags } = useFilter(notes);
+  const { allTags, selectedTags, toggleTag, filteredNotes } = useFilter(notes);
 
   if (loading) {
     return <p className="text-sm text-muted-foreground text-center py-8">로딩 중...</p>;
@@ -26,11 +26,11 @@ export function NoteList({ selectedNoteId, onSelect }: NoteListProps) {
 
   return (
     <>
-      <TagFilter tags={allTags} />
+      <TagFilter tags={allTags} selectedTags={selectedTags} onToggleTag={toggleTag} />
       <p className="text-xs font-semibold tracking-widest uppercase text-muted-foreground px-1 pb-1">
-        노트 {notes.length}개
+        노트 {filteredNotes.length}개
       </p>
-      {notes.map((note) => (
+      {filteredNotes.map((note) => (
         <NoteItem
           key={note.id}
           note={note}
