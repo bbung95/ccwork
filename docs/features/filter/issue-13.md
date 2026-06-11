@@ -67,12 +67,14 @@ interface TagFilterProps {
 
 - [정상] NoteList — should render TagFilter with tag chips when notes have tags ✅
 - [경계] NoteList — should not render TagFilter when no note has tags ✅
+- [정상] NoteList — should render TagFilter above the note items in DOM order ✅ (AC 검증 보강)
+- [정상] NoteList — should remove a tag chip after the note exclusively owning that tag is deleted ✅ (AC 검증 보강)
 
 ## AC 커버리지
 
-| AC 항목                                                                 | 커버하는 시나리오                                                                                                                                     |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 태그가 있는 노트가 하나라도 있으면 TagFilter가 NoteList 상단에 표시된다 | [정상] NoteList — render TagFilter when notes have tags · [정상] TagFilter — one chip per tag                                                         |
-| 칩 목록은 전체 노트의 태그 합집합이다 (중복 제거)                       | [정상] useFilter — union of all note tags · [정상] useFilter — deduplicate shared tag                                                                 |
-| 전체 노트에 태그가 하나도 없으면 TagFilter 영역이 렌더링되지 않는다     | [경계] TagFilter — render nothing when tags empty · [경계] NoteList — not render TagFilter when no tags · [경계] useFilter — empty array when no tags |
-| 특정 태그를 가진 노트를 모두 삭제하면 해당 태그 칩이 자동으로 사라진다  | [정상] useFilter — recompute allTags when notes change (파생 검증)                                                                                    |
+| AC 항목                                                                 | 커버하는 시나리오                                                                                                                                       |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 태그가 있는 노트가 하나라도 있으면 TagFilter가 NoteList 상단에 표시된다 | [정상] NoteList — render TagFilter when notes have tags · [정상] NoteList — TagFilter above note items (DOM 순서) · [정상] TagFilter — one chip per tag |
+| 칩 목록은 전체 노트의 태그 합집합이다 (중복 제거)                       | [정상] useFilter — union of all note tags · [정상] useFilter — deduplicate shared tag                                                                   |
+| 전체 노트에 태그가 하나도 없으면 TagFilter 영역이 렌더링되지 않는다     | [경계] TagFilter — render nothing when tags empty · [경계] NoteList — not render TagFilter when no tags · [경계] useFilter — empty array when no tags   |
+| 특정 태그를 가진 노트를 모두 삭제하면 해당 태그 칩이 자동으로 사라진다  | [정상] useFilter — recompute allTags when notes change (파생 검증) · [정상] NoteList — remove chip after exclusive note deleted (통합 경로)             |
