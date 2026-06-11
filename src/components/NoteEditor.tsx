@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNotes } from '../context/NotesContext';
+import { useTags, MAX_TAGS } from '../hooks/useTags';
+import { EditorTagChip } from './EditorTagChip';
+import { TagInput } from './TagInput';
 
 interface NoteEditorProps {
   selectedNoteId: string | null;
@@ -14,15 +17,18 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
   const [saving, setSaving] = useState(false);
 
   const selectedNote = notes.find((n) => n.id === selectedNoteId);
+  const { tags, addTag, removeTag, setTags } = useTags(selectedNote?.tags ?? []);
 
   // 선택된 노트가 바뀔 때 폼 동기화
   useEffect(() => {
     if (selectedNote) {
       setTitle(selectedNote.title);
       setContent(selectedNote.content);
+      setTags(selectedNote.tags ?? []);
     } else if (isCreating) {
       setTitle('');
       setContent('');
+      setTags([]);
     }
   }, [selectedNoteId, isCreating]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -35,9 +41,9 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
     setSaving(true);
     try {
       if (isCreating) {
-        await createNote(title, content);
+        await createNote(title, content, tags);
       } else if (selectedNoteId) {
-        await updateNote(selectedNoteId, { title, content });
+        await updateNote(selectedNoteId, { title, content, tags });
       }
       onDone();
     } catch (e) {
@@ -53,9 +59,7 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
       <div className="flex items-center justify-center h-full">
         <div className="text-center space-y-3">
           <p className="text-5xl">📝</p>
-          <p className="text-muted-foreground text-sm">
-            노트를 선택하거나 새 노트를 만드세요
-          </p>
+          <p className="text-muted-foreground text-sm">노트를 선택하거나 새 노트를 만드세요</p>
         </div>
       </div>
     );
@@ -88,6 +92,18 @@ export function NoteEditor({ selectedNoteId, isCreating, onDone }: NoteEditorPro
         rows={14}
         className="w-full text-base text-foreground/70 bg-transparent border-none outline-none resize-none placeholder:text-muted-foreground/50 leading-relaxed"
       />
+
+      {/* 태그 영역 */}
+      <div className="mt-4 space-y-3">
+        {tags.length > 0 && (
+          <div data-testid="tag-area" className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <EditorTagChip key={tag} label={tag} onRemove={() => removeTag(tag)} />
+            ))}
+          </div>
+        )}
+        <TagInput key={selectedNoteId} onAdd={addTag} disabled={tags.length >= MAX_TAGS} />
+      </div>
 
       {/* 버튼 영역 */}
       <div className="flex gap-3 mt-6 pt-4 border-t border-border">
