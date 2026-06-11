@@ -48,25 +48,25 @@ interface TagFilterProps {
 
 ### useFilter
 
-- [정상] useFilter — should return the union of all note tags when multiple notes have tags
-- [정상] useFilter — should deduplicate a tag shared by multiple notes
-- [정상] useFilter — should recompute allTags when notes change so a removed note's exclusive tag disappears
-- [경계] useFilter — should return an empty array when notes is empty
-- [경계] useFilter — should return an empty array when no note has tags (undefined or empty tags)
+- [정상] useFilter — should return the union of all note tags when multiple notes have tags ✅
+- [정상] useFilter — should deduplicate a tag shared by multiple notes ✅
+- [정상] useFilter — should recompute allTags when notes change so a removed note's exclusive tag disappears ✅
+- [경계] useFilter — should return an empty array when notes is empty ✅
+- [경계] useFilter — should return an empty array when no note has tags (undefined or empty tags) ✅
 
 ### FilterTagChip
 
-- [정상] FilterTagChip — should render the given label text
+- [정상] FilterTagChip — should render the given label text ✅
 
 ### TagFilter
 
-- [정상] TagFilter — should render one chip per tag
-- [경계] TagFilter — should render nothing when tags is empty
+- [정상] TagFilter — should render one chip per tag ✅
+- [경계] TagFilter — should render nothing when tags is empty ✅
 
 ### NoteList
 
-- [정상] NoteList — should render TagFilter with tag chips when notes have tags
-- [경계] NoteList — should not render TagFilter when no note has tags
+- [정상] NoteList — should render TagFilter with tag chips when notes have tags ✅
+- [경계] NoteList — should not render TagFilter when no note has tags ✅
 
 ## AC 커버리지
 
