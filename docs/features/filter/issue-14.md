@@ -56,31 +56,31 @@ interface TagFilterProps {
 
 ### useFilter
 
-- [정상] toggleTag — should add a tag to selectedTags when it is not selected
-- [정상] toggleTag — should remove a tag from selectedTags when it is already selected
-- [경계] selectedTags — should be empty initially
-- [정상] filteredNotes — should return all notes when selectedTags is empty
-- [정상] filteredNotes — should return only notes containing the selected tag when one tag is selected
-- [정상] filteredNotes — should return notes matching ANY selected tag (OR) when multiple tags are selected
-- [경계] filteredNotes — should exclude untagged notes when a tag is selected
-- [정상] useFilter — should keep selectedTags and recompute filteredNotes when a new non-matching note is added
+- [정상] toggleTag — should add a tag to selectedTags when it is not selected ✅
+- [정상] toggleTag — should remove a tag from selectedTags when it is already selected ✅
+- [경계] selectedTags — should be empty initially ✅
+- [정상] filteredNotes — should return all notes when selectedTags is empty ✅
+- [정상] filteredNotes — should return only notes containing the selected tag when one tag is selected ✅
+- [정상] filteredNotes — should return notes matching ANY selected tag (OR) when multiple tags are selected ✅
+- [경계] filteredNotes — should exclude untagged notes when a tag is selected ✅
+- [정상] useFilter — should keep selectedTags and recompute filteredNotes when a new non-matching note is added ✅
 
 ### FilterTagChip
 
-- [정상] FilterTagChip — should call onToggle when clicked
-- [정상] FilterTagChip — should expose aria-pressed true when selected
-- [경계] FilterTagChip — should expose aria-pressed false when not selected
+- [정상] FilterTagChip — should call onToggle when clicked ✅
+- [정상] FilterTagChip — should expose aria-pressed true when selected ✅
+- [경계] FilterTagChip — should expose aria-pressed false when not selected ✅
 
 ### TagFilter
 
-- [정상] TagFilter — should mark a chip as selected (aria-pressed) when its tag is in selectedTags
-- [정상] TagFilter — should call onToggleTag with the tag when a chip is clicked
+- [정상] TagFilter — should mark a chip as selected (aria-pressed) when its tag is in selectedTags ✅
+- [정상] TagFilter — should call onToggleTag with the tag when a chip is clicked ✅
 
 ### NoteList
 
-- [정상] NoteList — should render only notes matching the selected tag after a chip is clicked
-- [정상] NoteList — should render all notes again after the selected chip is clicked off
-- [정상] NoteList — should keep the filter selection when selectedNoteId changes
+- [정상] NoteList — should render only notes matching the selected tag after a chip is clicked ✅
+- [정상] NoteList — should render all notes again after the selected chip is clicked off ✅
+- [정상] NoteList — should keep the filter selection when selectedNoteId changes ✅
 
 ## AC 커버리지
 
