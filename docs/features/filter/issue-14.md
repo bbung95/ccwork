@@ -70,6 +70,8 @@ interface TagFilterProps {
 - [정상] FilterTagChip — should call onToggle when clicked ✅
 - [정상] FilterTagChip — should expose aria-pressed true when selected ✅
 - [경계] FilterTagChip — should expose aria-pressed false when not selected ✅
+- [정상] FilterTagChip — should apply blue selected styles when selected ✅ (AC 검증 보강)
+- [경계] FilterTagChip — should apply muted styles when not selected ✅ (AC 검증 보강)
 
 ### TagFilter
 

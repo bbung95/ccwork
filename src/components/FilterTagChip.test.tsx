@@ -25,4 +25,14 @@ describe('FilterTagChip', () => {
     render(<FilterTagChip label="react" selected={false} onToggle={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'react' })).toHaveAttribute('aria-pressed', 'false');
   });
+
+  it('should apply blue selected styles when selected (AC1 시각 보강)', () => {
+    render(<FilterTagChip label="react" selected={true} onToggle={vi.fn()} />);
+    expect(screen.getByText('react')).toHaveClass('bg-blue-soft', 'text-blue');
+  });
+
+  it('should apply muted styles when not selected (AC1 시각 보강)', () => {
+    render(<FilterTagChip label="react" selected={false} onToggle={vi.fn()} />);
+    expect(screen.getByText('react')).toHaveClass('bg-muted', 'text-muted-foreground');
+  });
 });
