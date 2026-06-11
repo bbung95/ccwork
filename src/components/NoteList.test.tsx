@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NoteList } from './NoteList';
 import type { Note } from '../types/note';
 
@@ -89,5 +90,56 @@ describe('NoteList', () => {
 
     expect(screen.queryByText('vue')).not.toBeInTheDocument();
     expect(screen.getByText('react')).toBeInTheDocument();
+  });
+
+  it('should render only notes matching the selected tag after a chip is clicked', async () => {
+    const notes = [
+      makeNote({ id: '1', title: 'Note React', tags: ['react'] }),
+      makeNote({ id: '2', title: 'Note Vue', tags: ['vue'] }),
+    ];
+    mockUseNotes.mockReturnValue(mockContext(notes));
+
+    render(<NoteList selectedNoteId={null} onSelect={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'react' }));
+
+    expect(screen.getByText('Note React')).toBeInTheDocument();
+    expect(screen.queryByText('Note Vue')).not.toBeInTheDocument();
+  });
+
+  it('should render all notes again after the selected chip is clicked off', async () => {
+    const notes = [
+      makeNote({ id: '1', title: 'Note React', tags: ['react'] }),
+      makeNote({ id: '2', title: 'Note Vue', tags: ['vue'] }),
+    ];
+    mockUseNotes.mockReturnValue(mockContext(notes));
+
+    render(<NoteList selectedNoteId={null} onSelect={vi.fn()} />);
+
+    const chip = screen.getByRole('button', { name: 'react' });
+    await userEvent.click(chip);
+    expect(screen.queryByText('Note Vue')).not.toBeInTheDocument();
+
+    await userEvent.click(chip);
+    expect(screen.getByText('Note Vue')).toBeInTheDocument();
+  });
+
+  it('should keep the filter selection when selectedNoteId changes', async () => {
+    const notes = [
+      makeNote({ id: '1', title: 'Note React', tags: ['react'] }),
+      makeNote({ id: '2', title: 'Note Vue', tags: ['vue'] }),
+    ];
+    mockUseNotes.mockReturnValue(mockContext(notes));
+
+    const { rerender } = render(<NoteList selectedNoteId={null} onSelect={vi.fn()} />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'react' }));
+    expect(screen.queryByText('Note Vue')).not.toBeInTheDocument();
+
+    // 노트 선택(selectedNoteId 변경) → 필터 상태 유지
+    rerender(<NoteList selectedNoteId="1" onSelect={vi.fn()} />);
+
+    expect(screen.getByRole('button', { name: 'react' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByText('Note Vue')).not.toBeInTheDocument();
   });
 });

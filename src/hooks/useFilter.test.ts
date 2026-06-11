@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useFilter } from './useFilter';
 import type { Note } from '../types/note';
 
@@ -53,5 +53,91 @@ describe('useFilter', () => {
     const notes = [makeNote({ id: '1', tags: [] }), makeNote({ id: '2', tags: undefined })];
     const { result } = renderHook(() => useFilter(notes));
     expect(result.current.allTags).toEqual([]);
+  });
+});
+
+describe('useFilter — 선택/필터링 (#14)', () => {
+  it('should add a tag to selectedTags when it is not selected', () => {
+    const notes = [makeNote({ id: '1', tags: ['react'] })];
+    const { result } = renderHook(() => useFilter(notes));
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    expect(result.current.selectedTags).toContain('react');
+  });
+
+  it('should remove a tag from selectedTags when it is already selected', () => {
+    const notes = [makeNote({ id: '1', tags: ['react'] })];
+    const { result } = renderHook(() => useFilter(notes));
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    expect(result.current.selectedTags).not.toContain('react');
+  });
+
+  it('should be empty initially', () => {
+    const notes = [makeNote({ id: '1', tags: ['react'] })];
+    const { result } = renderHook(() => useFilter(notes));
+    expect(result.current.selectedTags).toEqual([]);
+  });
+
+  it('should return all notes when selectedTags is empty', () => {
+    const notes = [makeNote({ id: '1', tags: ['react'] }), makeNote({ id: '2', tags: ['vue'] })];
+    const { result } = renderHook(() => useFilter(notes));
+    expect(result.current.filteredNotes).toHaveLength(2);
+  });
+
+  it('should return only notes containing the selected tag when one tag is selected', () => {
+    const notes = [makeNote({ id: '1', tags: ['react'] }), makeNote({ id: '2', tags: ['vue'] })];
+    const { result } = renderHook(() => useFilter(notes));
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    expect(result.current.filteredNotes.map((n) => n.id)).toEqual(['1']);
+  });
+
+  it('should return notes matching ANY selected tag (OR) when multiple tags are selected', () => {
+    const notes = [
+      makeNote({ id: '1', tags: ['react'] }),
+      makeNote({ id: '2', tags: ['typescript'] }),
+      makeNote({ id: '3', tags: ['vue'] }),
+    ];
+    const { result } = renderHook(() => useFilter(notes));
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    act(() => {
+      result.current.toggleTag('typescript');
+    });
+    expect(result.current.filteredNotes.map((n) => n.id)).toEqual(['1', '2']);
+  });
+
+  it('should exclude untagged notes when a tag is selected', () => {
+    const notes = [makeNote({ id: '1', tags: ['react'] }), makeNote({ id: '2', tags: undefined })];
+    const { result } = renderHook(() => useFilter(notes));
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    expect(result.current.filteredNotes.map((n) => n.id)).toEqual(['1']);
+  });
+
+  it('should keep selectedTags and recompute filteredNotes when a new non-matching note is added', () => {
+    const initial = [makeNote({ id: '1', tags: ['react'] })];
+    const { result, rerender } = renderHook(({ notes }) => useFilter(notes), {
+      initialProps: { notes: initial },
+    });
+    act(() => {
+      result.current.toggleTag('react');
+    });
+    expect(result.current.filteredNotes.map((n) => n.id)).toEqual(['1']);
+
+    // 태그 없는 새 노트 추가 → 선택 유지, 미충족 노트는 미포함
+    rerender({ notes: [...initial, makeNote({ id: '2', tags: [] })] });
+
+    expect(result.current.selectedTags).toEqual(['react']);
+    expect(result.current.filteredNotes.map((n) => n.id)).toEqual(['1']);
   });
 });
