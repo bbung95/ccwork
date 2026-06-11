@@ -32,8 +32,9 @@ test.describe('태그 — 저장 영속성 (E2E 고유 검증)', () => {
     await page.reload();
     await page.getByText(title).click();
 
-    await expect(page.getByText('react')).toBeVisible();
-    await expect(page.getByText('typescript')).toBeVisible();
+    const tagArea = page.getByTestId('tag-area');
+    await expect(tagArea.getByText('react')).toBeVisible();
+    await expect(tagArea.getByText('typescript')).toBeVisible();
   });
 
   test('태그를 제거하고 저장하면 제거가 서버에 반영된다', async ({ page }) => {
@@ -59,7 +60,7 @@ test.describe('태그 — 저장 영속성 (E2E 고유 검증)', () => {
     await page.reload();
     await page.getByText(title).click();
 
-    await expect(page.getByText('keep')).toBeVisible();
+    await expect(page.getByTestId('tag-area').getByText('keep')).toBeVisible();
     await expect(page.getByText('drop')).toHaveCount(0);
   });
 });
@@ -99,18 +100,18 @@ test.describe('태그 — 미저장 변경 (내비게이션)', () => {
     await page.getByText(titleA).click();
     await tagInput.fill('unsavedtemp');
     await tagInput.press('Enter');
-    await expect(page.getByText('unsavedtemp')).toBeVisible();
+    await expect(page.getByTestId('tag-area').getByText('unsavedtemp')).toBeVisible();
 
     // 저장 없이 노트 B로 이동했다가 다시 A로 돌아온다 → 미저장 태그는 사라진다
     await page.getByText(titleB).click();
     await page.getByText(titleA).click();
-    await expect(page.getByText('permanent')).toBeVisible();
+    await expect(page.getByTestId('tag-area').getByText('permanent')).toBeVisible();
     await expect(page.getByText('unsavedtemp')).toHaveCount(0);
 
     // E2E 고유 검증: 미저장 태그는 서버에도 기록되지 않았다
     await page.reload();
     await page.getByText(titleA).click();
-    await expect(page.getByText('permanent')).toBeVisible();
+    await expect(page.getByTestId('tag-area').getByText('permanent')).toBeVisible();
     await expect(page.getByText('unsavedtemp')).toHaveCount(0);
   });
 });
